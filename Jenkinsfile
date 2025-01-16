@@ -1,7 +1,7 @@
 pipeline {
     agent none
     tools{
-        mvn "mymaven"
+        maven "mymaven"
     }
     stages {
         stage('compile') {
