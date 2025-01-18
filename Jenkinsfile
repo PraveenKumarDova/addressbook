@@ -39,7 +39,7 @@ pipeline {
             // agent {label'linux_slave1'}
             input{
                 message "Select the version to deploy"
-                OK "Version selected"
+                ok "Version selected"
                 parameters{
                     choice(name:'NEWAPP',choices:['1.2','2.1','3.1'])
                 }
