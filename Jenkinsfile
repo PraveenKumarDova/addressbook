@@ -17,6 +17,11 @@ pipeline {
             }
         }    
         stage('test') {
+            when{
+                expression{
+                    params.executeTests==true
+                }
+            }
             agent any 
             steps {
                 echo "test the code"
