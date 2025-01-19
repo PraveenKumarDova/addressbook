@@ -38,7 +38,7 @@ pipeline {
         }
         
         stage('package') {
-            agent any          
+            // agent any          
             // agent {label'linux_slave1'}
             // input{
             //     message "Select the version to deploy"
