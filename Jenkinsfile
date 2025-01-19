@@ -3,10 +3,10 @@ pipeline {
     tools{
         maven "mymaven"
     }
-    Environment{
+    Environment {
         DEV_SERVER_IP='ec2-user@172.31.44.233'
     }
-    parameters{
+    parameters {
         string(name: 'Env', defaultValue: 'Test', description: 'Envt to deploy')
         booleanParam(name: 'executeTests', defaultValue: true, description: 'decide to run tc')
         choice(name: 'APPVERSION', choices: ['1.1', '1.2', '1.3'])
