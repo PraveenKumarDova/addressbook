@@ -25,7 +25,7 @@ pipeline {
                     params.executeTests==true
                 }
             }
-            agent any 
+            agent {label 'linux_slave1'}
             steps {
                 echo "test the code"
                 sh "mvn test" 
