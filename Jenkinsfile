@@ -12,14 +12,14 @@ pipeline {
         choice(name: 'APPVERSION', choices: ['1.1', '1.2', '1.3'])
     }
     stages {
-        stage('compile') {
+        stage('compile') { // /var/lib/jenkins/workspace
             agent any 
             steps {
                 echo "compile the code in ${params.Env}"
                 sh "mvn compile" 
             }
         }    
-        stage('test') {
+        stage('test') { // /tmp/workspace
             when{
                 expression{
                     params.executeTests==true
@@ -37,7 +37,7 @@ pipeline {
             }       
         }
         
-        stage('package') {
+        stage('package') { // package will be executed on /var/lib/jenkins  master
             agent any          
             // agent {label'linux_slave1'}
             // input{
