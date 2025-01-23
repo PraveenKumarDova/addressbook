@@ -79,7 +79,6 @@ pipeline {
                 sshagent(['jenkins-slave2']){
                     withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                     echo "package the code ${params.APPVERSION}"
-                    sh "scp -o StrictHostKeyChecking=no server-script.sh ${DEPLOY_SERVER_IP}:/home/ec2-user"
                     sh "ssh ${DEPLOY_SERVER_IP} sudo yum install docker -y"
                     sh "ssh ${DEPLOY_SERVER_IP} sudo systemctl start docker"
                     sh "ssh ${DEPLOY_SERVER_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
