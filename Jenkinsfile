@@ -97,8 +97,8 @@ pipeline {
                 script{
                     echo "Deploy on EKS cluster"
                     sh 'aws --version'
-                    sh 'aws configure set aws_access_key_id${ACCESS_KEY}'
-                    sh 'aws configure set aws_secret_access_key_id${SECRET_ACCESS_KEY}'
+                    sh 'aws configure set aws_access_key_id ${ACCESS_KEY}'
+                    sh 'aws configure set aws_secret_access_key ${SECRET_ACCESS_KEY}'
                     sh 'aws eks update-kubeconfig --region eu-west-2 --name myeks1'
                     sh 'kubectl get nodes'
                     sh 'envsubst < k8s-manifests/java-mvn-app.yml | kubectl apply -f -'
