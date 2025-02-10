@@ -7,6 +7,8 @@ pipeline {
         DEV_SERVER_IP='ec2-user@172.31.28.92'
         // DEPLOY_SERVER_IP='ec2-user@172.31.33.69'
         IMAGE_NAME='praveenkumardova/addressbook'
+        ACCESS_KEY=credentials('ACCESS_KEY')
+        SECRET_ACCESS_KEY=credentials('SECRET_ACCESS_KEY')
     }
     parameters {
         string(name: 'Env', defaultValue: 'Test', description: 'Envt to deploy')
