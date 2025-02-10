@@ -4,8 +4,8 @@ pipeline {
         maven "mymaven"
     }
     environment {
-        DEV_SERVER_IP='ec2-user@172.31.46.242'
-        DEPLOY_SERVER_IP='ec2-user@172.31.33.69'
+        DEV_SERVER_IP='ec2-user@172.31.28.92'
+        // DEPLOY_SERVER_IP='ec2-user@172.31.33.69'
         IMAGE_NAME='praveenkumardova/addressbook'
     }
     parameters {
@@ -64,30 +64,46 @@ pipeline {
             }
 
         }
-        stage('deploy') {
-            agent any          
-            // agent {label'linux_slave1'}
-            // input{
-            //     message "Select the version to deploy"
-            //     ok "Version selected"
-            //     parameters{
-            //         choice(name:'NEWAPP',choices:['1.2','2.1','3.1'])
-            //     }
-            // }
-            steps {
+        // stage('deploy') {
+        //     agent any          
+        //     // agent {label'linux_slave1'}
+        //     // input{
+        //     //     message "Select the version to deploy"
+        //     //     ok "Version selected"
+        //     //     parameters{
+        //     //         choice(name:'NEWAPP',choices:['1.2','2.1','3.1'])
+        //     //     }
+        //     // }
+        //     steps {
+        //         script{
+        //         sshagent(['jenkins-slave2']){
+        //             withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+        //             echo "package the code ${params.APPVERSION}"
+        //             sh "ssh ${DEPLOY_SERVER_IP} sudo yum install docker -y"
+        //             sh "ssh ${DEPLOY_SERVER_IP} sudo systemctl start docker"
+        //             sh "ssh ${DEPLOY_SERVER_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
+        //             sh "ssh ${DEPLOY_SERVER_IP} sudo docker run -it -d -P ${IMAGE_NAME}:${BUILD_NUMBER}"
+        //             }
+        //             }
+        //         }
+        //     }
+
+        // }
+        stage("Deploy on EKS"){
+            agent any
+            steps{
                 script{
-                sshagent(['jenkins-slave2']){
-                    withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                    echo "package the code ${params.APPVERSION}"
-                    sh "ssh ${DEPLOY_SERVER_IP} sudo yum install docker -y"
-                    sh "ssh ${DEPLOY_SERVER_IP} sudo systemctl start docker"
-                    sh "ssh ${DEPLOY_SERVER_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
-                    sh "ssh ${DEPLOY_SERVER_IP} sudo docker run -it -d -P ${IMAGE_NAME}:${BUILD_NUMBER}"
-                    }
-                    }
+                    echo "Deploy on EKS cluster"
+                    sh 'aws --version'
+                    sh 'aws configure set aws_access_key_id${ACCESS_KEY}'
+                    sh 'aws configure set aws_secret_access_key_id${SECRET_ACCESS_KEY}'
+                    sh 'aws eks update-kubeconfig --region eu-west-2 --name myeks1'
+                    sh 'kubectl get nodes'
+                    sh 'envsubst < k8s-manifests/java-mvn-app.yml | kubectl apply -f -'
+                    sh 'kubectl get all'
                 }
             }
-
         }
+
     }
 }
