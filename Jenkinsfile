@@ -4,8 +4,8 @@ pipeline {
         maven "mymaven"
     }
     environment {
-        DEV_SERVER_IP='ec2-user@172.31.46.242'
-        DEPLOY_SERVER_IP='ec2-user@172.31.33.69'
+        DEV_SERVER_IP='ec2-user@172.31.16.166' //Build server
+        //DEPLOY_SERVER_IP='ec2-user@172.31.33.69'
         IMAGE_NAME='praveenkumardova/addressbook'
     }
     parameters {
