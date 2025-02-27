@@ -64,6 +64,24 @@ pipeline {
             }
 
         }
+        
+        stage('Infrastructure provisioning'){
+            agent any
+            steps{
+                script{
+                    dir('terraform'){
+                        sh "terraform init"
+                        sh "terraform apply --auto-approve"
+                        EC2_PUBLIC_IP= sh(
+                            script: "terraform output ec2-ip",
+                            returnStdout: true
+                        ).trim()
+                    }
+                }
+            }
+        }
+
+
         stage('deploy') {
             agent any          
             // agent {label'linux_slave1'}
@@ -77,12 +95,15 @@ pipeline {
             steps {
                 script{
                 sshagent(['jenkins-slave2']){
+                    echo "waiting for ec2 instance to initialize"
+                    sleep(time:90,unit: "SECONDS")
+                    echo ${EC2_PUBLIC_IP}
                     withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                     echo "package the code ${params.APPVERSION}"
-                    sh "ssh ${DEPLOY_SERVER_IP} sudo yum install docker -y"
-                    sh "ssh ${DEPLOY_SERVER_IP} sudo systemctl start docker"
-                    sh "ssh ${DEPLOY_SERVER_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
-                    sh "ssh ${DEPLOY_SERVER_IP} sudo docker run -it -d -P ${IMAGE_NAME}:${BUILD_NUMBER}"
+                    sh "ssh -o StrictHostKeyChecking=no ec2-user@${EC2_PUBLIC_IP} sudo yum install docker -y"
+                    sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo systemctl start docker"
+                    sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
+                    sh "ssh ec2-user@${EC2_PUBLIC_IP} sudo docker run -it -d -p 8080:8080 ${IMAGE_NAME}:${BUILD_NUMBER}"
                     }
                     }
                 }
